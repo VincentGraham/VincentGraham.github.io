@@ -38,16 +38,20 @@ jobs:
 
       - name: Minify CSS files
         run: |
-          mkdir -p minified/css
-          find css -name '*.css' -exec sh -c \
-            'clean-css -o minified/css/$(basename "$1") "$1"' _ {} \;
+          if [ -d css ]; then
+            mkdir -p minified/css
+            find css -name '*.css' -exec sh -c \
+              'clean-css -o minified/css/$(basename "$1") "$1"' _ {} \;
+          fi
 
       - name: Minify JS files
         run: |
-          mkdir -p minified/js
-          find js -name '*.js' -exec sh -c \
-            'terser "$1" --compress --mangle \
-              --output minified/js/$(basename "$1")' _ {} \;
+          if [ -d js ]; then
+            mkdir -p minified/js
+            find js -name '*.js' -exec sh -c \
+              'terser "$1" --compress --mangle \
+                --output minified/js/$(basename "$1")' _ {} \;
+          fi
 
       - name: Checkout main branch
         uses: actions/checkout@v4
