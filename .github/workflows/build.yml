@@ -23,6 +23,11 @@ jobs:
           chmod +x build.sh
           ./build.sh
 
+      - name: Configure Git identity
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+
       - name: Deploy to main branch
         uses: peaceiris/actions-gh-pages@v3
         with:
