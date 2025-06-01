@@ -1,36 +1,50 @@
-name: Build and Deploy to GitHub Pages
+name: Minify and Deploy HTML
+
+
+permissions:
+  contents: write
 
 on:
   push:
-    branches: [source]
+    branches:
+      - source
 
 jobs:
-  build-deploy:
+  build-and-deploy:
     runs-on: ubuntu-latest
+
     steps:
       - name: Checkout source branch
         uses: actions/checkout@v4
         with:
-          fetch-depth: 0
+          ref: source
 
-      - name: Set up Node.js (if needed)
+      - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: 20
 
-      - name: Run build script
+      - name: Install html-minifier
+        run: npm install -g html-minifier
+
+      - name: Minify HTML files
         run: |
-          chmod +x build.sh
-          ./build.sh
+          mkdir minified
+          find . -name '*.html' -not -path './minified/*' -exec sh -c \
+            'html-minifier --collapse-whitespace --remove-comments --minify-css true --minify-js true -o minified/$(basename "$1") "$1"' _ {} \;
 
-      - name: Configure Git identity
-        run: |
-          git config --global user.name "github-actions[bot]"
-          git config --global user.email "github-actions[bot]@users.noreply.github.com"
-
-      - name: Deploy to gh-pages branch
-        uses: peaceiris/actions-gh-pages@v3
+      - name: Checkout main branch
+        uses: actions/checkout@v4
         with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./dist
-          publish_branch: gh-pages
+          ref: main
+          path: main_branch
+
+      - name: Copy minified files to main branch
+        run: |
+          cp minified/*.html main_branch/
+          cd main_branch
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add *.html
+          git commit -m "Minified HTML files from source branch" || echo "No changes to commit"
+          git push origin main
