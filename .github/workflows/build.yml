@@ -1,5 +1,4 @@
-name: Minify and Deploy HTML
-
+name: Minify and Deploy HTML/CSS/JS
 
 permissions:
   contents: write
@@ -24,14 +23,31 @@ jobs:
         with:
           node-version: 20
 
-      - name: Install html-minifier
-        run: npm install -g html-minifier
+      - name: Install minification tools
+        run: |
+          npm install -g html-minifier clean-css-cli terser
 
       - name: Minify HTML files
         run: |
-          mkdir minified
+          rm -rf minified
+          mkdir -p minified
           find . -name '*.html' -not -path './minified/*' -exec sh -c \
-            'html-minifier --collapse-whitespace --remove-comments --minify-css true --minify-js true -o minified/$(basename "$1") "$1"' _ {} \;
+            'html-minifier --collapse-whitespace --remove-comments \
+              --minify-css true --minify-js true \
+              -o minified/$(basename "$1") "$1"' _ {} \;
+
+      - name: Minify CSS files
+        run: |
+          mkdir -p minified/css
+          find css -name '*.css' -exec sh -c \
+            'clean-css -o minified/css/$(basename "$1") "$1"' _ {} \;
+
+      - name: Minify JS files
+        run: |
+          mkdir -p minified/js
+          find js -name '*.js' -exec sh -c \
+            'terser "$1" --compress --mangle \
+              --output minified/js/$(basename "$1")' _ {} \;
 
       - name: Checkout main branch
         uses: actions/checkout@v4
@@ -39,12 +55,38 @@ jobs:
           ref: main
           path: main_branch
 
-      - name: Copy minified files to main branch
+      - name: Copy minified files and assets to main branch
         run: |
-          cp minified/*.html main_branch/
+          # Copy minified HTML (this assumes at least one .html always exists)
+          cp minified/*.html main_branch/ || true
+
+          # Copy minified CSS only if css/ exists
+          if [ -d css ]; then
+            mkdir -p main_branch/css
+            cp minified/css/*.css main_branch/css/ || true
+          fi
+
+          # Copy minified JS only if js/ exists
+          if [ -d js ]; then
+            mkdir -p main_branch/js
+            cp minified/js/*.js main_branch/js/ || true
+          fi
+
+          # Copy images only if images/ exists
+          if [ -d images ]; then
+            mkdir -p main_branch/images
+            cp -r images/* main_branch/images/
+          fi
+
+          # Copy data only if data/ exists
+          if [ -d data ]; then
+            mkdir -p main_branch/data
+            cp -r data/* main_branch/data/
+          fi
+
           cd main_branch
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add *.html
-          git commit -m "Minified HTML files from source branch" || echo "No changes to commit"
+          git add *.html css js images data || true
+          git commit -m "Minified HTML/CSS/JS and copied assets from source" || echo "No changes to commit"
           git push origin main
