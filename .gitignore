@@ -1,0 +1,26 @@
+node_modules/
+
+dist/
+build/
+
+*.log
+*.tmp
+*.bak
+
+.DS_Store
+.AppleDouble
+.LSOverride
+._*
+
+.vscode/
+
+*_thumb.*
+*.webp
+
+__pycache__/
+*.pyc
+
+
+# Ignore GitHub Pages deployment branch
+# (optional if you ever pull main into source)
+main/
