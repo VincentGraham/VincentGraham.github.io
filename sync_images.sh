@@ -32,6 +32,10 @@ git stash push -m "temp-stash-before-updating-images" || true
 echo "⏳ Checking out '$MAIN_BRANCH'..."
 git checkout "$MAIN_BRANCH"
 
+# 5.5. Pull latest changes from main
+echo "⏳ Pulling latest changes from '$MAIN_BRANCH'..."
+git pull origin "$MAIN_BRANCH"
+
 # 6. Prepare target folder on main (create if missing)
 echo "⏳ Ensuring '$IMAGES_PATH' exists on '$MAIN_BRANCH'..."
 mkdir -p "$IMAGES_PATH"
