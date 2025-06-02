@@ -24,27 +24,27 @@ TMP_DIR=$(mktemp -d)
 echo "⏳ Copying '$IMAGES_PATH' → temporary folder '$TMP_DIR'..."
 rsync -a "$IMAGES_PATH"/ "$TMP_DIR"/
 
-# 4. Stash any uncommitted changes in source (to allow a clean checkout)
+# 4. Remove macOS artifacts (.DS_Store, AppleDouble files) from the temp copy
+echo "⏳ Removing macOS hidden files from temp copy..."
+find "$TMP_DIR" -type f \( -name ".DS_Store" -o -name "._*" \) -delete
+
+# 5. Stash any uncommitted changes in source (to allow a clean checkout)
 git add -A
 git stash push -m "temp-stash-before-updating-images" || true
 
-# 5. Checkout main branch
+# 6. Checkout main branch
 echo "⏳ Checking out '$MAIN_BRANCH'..."
 git checkout "$MAIN_BRANCH"
 
-# 5.5. Pull latest changes from main
-echo "⏳ Pulling latest changes from '$MAIN_BRANCH'..."
-git pull origin "$MAIN_BRANCH"
-
-# 6. Prepare target folder on main (create if missing)
+# 7. Prepare target folder on main (create if missing)
 echo "⏳ Ensuring '$IMAGES_PATH' exists on '$MAIN_BRANCH'..."
 mkdir -p "$IMAGES_PATH"
 
-# 7. Copy from temporary folder into main’s images path
+# 8. Copy from temporary folder into main’s images path
 echo "⏳ Moving images from temp → '$IMAGES_PATH'..."
 rsync -a --delete "$TMP_DIR"/ "$IMAGES_PATH"/
 
-# 8. Stage & commit any changes
+# 9. Stage & commit any changes
 cd "$IMAGES_PATH/.."
 git add "$(basename "$IMAGES_PATH")"
 if git diff --cached --quiet; then
@@ -56,11 +56,11 @@ else
   git push origin "$MAIN_BRANCH"
 fi
 
-# 9. Clean up temp folder
+# 10. Clean up temp folder
 echo "⏳ Removing temporary folder '$TMP_DIR'..."
 rm -rf "$TMP_DIR"
 
-# 10. Checkout back to source and pop stash
+# 11. Checkout back to source and pop stash
 echo "⏳ Switching back to 'source'..."
 git checkout source
 
