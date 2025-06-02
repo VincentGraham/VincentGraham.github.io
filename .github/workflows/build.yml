@@ -24,33 +24,51 @@ jobs:
           node-version: 20
 
       - name: Install minification tools
-        run: |
-          npm install -g html-minifier clean-css-cli terser
+        run: npm install -g html-minifier clean-css-cli terser
 
-      - name: Minify HTML files
+      - name: Minify HTML files (preserve folder structure)
         run: |
           rm -rf minified
-          mkdir -p minified
-          find . -name '*.html' -not -path './minified/*' -exec sh -c \
-            'html-minifier --collapse-whitespace --remove-comments \
-              --minify-css true --minify-js true \
-              -o minified/$(basename "$1") "$1"' _ {} \;
+          # For every .html (excluding anything already under minified/),
+          # create its parent folder in minified/ and write the minified output there:
+          find . -type f -name '*.html' -not -path './minified/*' \
+            -exec sh -c '
+              for filepath; do
+                # remove leading "./" if present
+                rel="${filepath#./}"
+                # ensure target directory exists
+                mkdir -p "minified/$(dirname "$rel")"
+                # run html-minifier into the mirrored path under minified/
+                html-minifier --collapse-whitespace --remove-comments \
+                  --minify-css true --minify-js true \
+                  -o "minified/$rel" "$rel"
+              done
+            ' _ {} +
 
-      - name: Minify CSS files
+      - name: Minify CSS files (preserve folder structure)
         run: |
           if [ -d css ]; then
-            mkdir -p minified/css
-            find css -name '*.css' -exec sh -c \
-              'clean-css -o minified/css/$(basename "$1") "$1"' _ {} \;
+            find css -type f -name '*.css' -not -path './minified/css/*' \
+              -exec sh -c '
+                for cssfile; do
+                  rel="${cssfile#./}"
+                  mkdir -p "minified/$(dirname "$rel")"
+                  clean-css -o "minified/$rel" "$rel"
+                done
+              ' _ {} +
           fi
 
-      - name: Minify JS files
+      - name: Minify JS files (preserve folder structure)
         run: |
           if [ -d js ]; then
-            mkdir -p minified/js
-            find js -name '*.js' -exec sh -c \
-              'terser "$1" --compress --mangle \
-                --output minified/js/$(basename "$1")' _ {} \;
+            find js -type f -name '*.js' -not -path './minified/js/*' \
+              -exec sh -c '
+                for jsfile; do
+                  rel="${jsfile#./}"
+                  mkdir -p "minified/$(dirname "$rel")"
+                  terser "$rel" --compress --mangle --output "minified/$rel"
+                done
+              ' _ {} +
           fi
 
       - name: Checkout main branch
@@ -59,38 +77,32 @@ jobs:
           ref: main
           path: main_branch
 
-      - name: Copy minified files and assets to main branch
+      - name: Copy minified files and other assets to main branch
         run: |
-          # Copy minified HTML (this assumes at least one .html always exists)
-          cp minified/*.html main_branch/ || true
+          # Remove old files if needed (optional cleanup)
+          # rm -rf main_branch/*
 
-          # Copy minified CSS only if css/ exists
-          if [ -d css ]; then
-            mkdir -p main_branch/css
-            cp minified/css/*.css main_branch/css/ || true
+          # Copy everything in minified/ (which mirrors your folder tree)
+          rsync -av --delete minified/ main_branch/
+
+          # If you have other static directories to copy (images, data, etc.), do so:
+          # e.g. only if they exist on source; skip if missing
+          if [ -d 3dgs/images ]; then
+            mkdir -p main_branch/3dgs/images
+            rsync -av --delete 3dgs/images/ main_branch/3dgs/images/
           fi
-
-          # Copy minified JS only if js/ exists
-          if [ -d js ]; then
-            mkdir -p main_branch/js
-            cp minified/js/*.js main_branch/js/ || true
+          if [ -d 3dgs/images/thumbs ]; then
+            mkdir -p main_branch/3dgs/images/thumbs
+            rsync -av --delete 3dgs/images/thumbs/ main_branch/3dgs/images/thumbs/
           fi
-
-          # Copy images only if images/ exists
-          if [ -d images ]; then
-            mkdir -p main_branch/images
-            cp -r images/* main_branch/images/
-          fi
-
-          # Copy data only if data/ exists
           if [ -d data ]; then
             mkdir -p main_branch/data
-            cp -r data/* main_branch/data/
+            rsync -av --delete data/ main_branch/data/
           fi
 
           cd main_branch
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add *.html css js images data || true
+          git add .
           git commit -m "Minified HTML/CSS/JS and copied assets from source" || echo "No changes to commit"
           git push origin main
