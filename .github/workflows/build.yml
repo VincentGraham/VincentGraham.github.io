@@ -29,16 +29,11 @@ jobs:
       - name: Minify HTML files (preserve folder structure)
         run: |
           rm -rf minified
-          # For every .html (excluding anything already under minified/),
-          # create its parent folder in minified/ and write the minified output there:
           find . -type f -name '*.html' -not -path './minified/*' \
             -exec sh -c '
               for filepath; do
-                # remove leading "./" if present
                 rel="${filepath#./}"
-                # ensure target directory exists
                 mkdir -p "minified/$(dirname "$rel")"
-                # run html-minifier into the mirrored path under minified/
                 html-minifier --collapse-whitespace --remove-comments \
                   --minify-css true --minify-js true \
                   -o "minified/$rel" "$rel"
@@ -79,14 +74,14 @@ jobs:
 
       - name: Copy minified files and other assets to main branch
         run: |
-          # Remove old files if needed (optional cleanup)
-          # rm -rf main_branch/*
+          # ─── Copy the entire minified/ directory into main_branch/, but
+          #     exclude the .git folder so we don’t delete it or blow away history ───
+          rsync -av \
+            --delete \
+            --exclude='.git' \
+            minified/ main_branch/
 
-          # Copy everything in minified/ (which mirrors your folder tree)
-          rsync -av --delete minified/ main_branch/
-
-          # If you have other static directories to copy (images, data, etc.), do so:
-          # e.g. only if they exist on source; skip if missing
+          # ─── Next, copy over any static directories you need (images, data, etc.) ───
           if [ -d 3dgs/images ]; then
             mkdir -p main_branch/3dgs/images
             rsync -av --delete 3dgs/images/ main_branch/3dgs/images/
