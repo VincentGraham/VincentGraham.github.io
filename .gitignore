@@ -1,5 +1,7 @@
 node_modules/
 
+# build artifact during actions
+minified/ 
 dist/
 build/
 
@@ -19,6 +21,13 @@ build/
 
 __pycache__/
 *.pyc
+
+# Ignore source assets, manually put them in the `main` branch
+# ignore everything in 3dgs/images except we’ll explicitly track these files
+3dgs/images/
+
+# minify and web optimize the images
+make_thumbnails.sh
 
 
 # Ignore GitHub Pages deployment branch

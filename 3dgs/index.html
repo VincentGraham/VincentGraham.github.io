@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Macro 3D Showcase | Input Photos & Viewer</title>
+
+  <!-- GLightbox CSS (optional if you still want click‐to‐zoom) -->
+  <link
+    rel="stylesheet"
+    href="https://cdn.jsdelivr.net/npm/glightbox/dist/css/glightbox.min.css"
+  />
+
+  <!-- Custom CSS (optional) -->
+  <link rel="stylesheet" href="css/style.css" />
+
+  <style>
+    body {
+      margin: 0;
+      font-family: sans-serif;
+      background: #111;
+      color: #eee;
+      line-height: 1.5;
+    }
+    a {
+      color: #00b894;
+      text-decoration: none;
+    }
+    header {
+      background: #222;
+      padding: 1rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    header h1 {
+      margin: 0;
+      font-size: 1.5rem;
+    }
+    header nav a {
+      margin-left: 1rem;
+      font-size: 0.9rem;
+    }
+    main {
+      max-width: 960px;
+      margin: 2rem auto;
+      padding: 0 1rem;
+    }
+    section {
+      margin-bottom: 3rem;
+    }
+
+    /* Grid container for all images */
+    .gallery {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+      gap: 0.75rem;
+    }
+    .gallery img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      border-radius: 4px;
+      border: 1px solid #333;
+      cursor: pointer;
+      transition: transform 0.2s;
+    }
+    .gallery img:hover {
+      transform: scale(1.02);
+    }
+
+    /* Button style */
+    .btn-primary {
+      display: inline-block;
+      margin-top: 0.5rem;
+      padding: 0.6rem 1.2rem;
+      background: #00b894;
+      color: #fff;
+      border-radius: 6px;
+      font-size: 0.95rem;
+    }
+    .btn-primary:hover {
+      background: #019875;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Header / Navbar -->
+  <header>
+    <h1>Macro 3D Showcase</h1>
+    <nav>
+      <a href="/">← Home</a>
+    </nav>
+  </header>
+
+  <main>
+    <!-- Intro / Description -->
+    <section id="intro">
+      <p>
+        Welcome to the Macro 3D dataset showcase. Below is a grid of every input photograph
+        (dropped into <code>3dgs/images/</code>). Clicking an image will open it full-size
+        (via GLightbox). Scroll down to see all captures; then click “Launch 3D Viewer” to
+        explore the Gaussian Splat results.
+      </p>
+    </section>
+
+    <!-- Grid of All Images in 3dgs/images/ -->
+    <section id="input-photos">
+      <h2>All Input Photos</h2>
+      <div class="gallery">
+        <!-- 
+          For each file you place into 3dgs/images/, add a new <a> → <img> pair here.
+          Replace "photo1.jpg", "photo2.jpg", etc. with your actual filenames.
+        -->
+
+        <a
+          href="images/photo1.jpg"
+          class="glightbox"
+          data-gallery="all-photos"
+          data-title="photo1.jpg"
+        >
+          <img src="images/thumbs/photo1.jpg" alt="photo1.jpg" />
+        </a>
+
+        <a
+          href="images/thumbs/photo2.jpg"
+          class="glightbox"
+          data-gallery="all-photos"
+          data-title="photo2.jpg"
+        >
+          <img src="images/photo2.jpg" alt="photo2.jpg" />
+        </a>
+
+        <a
+          href="images/photo3.jpg"
+          class="glightbox"
+          data-gallery="all-photos"
+          data-title="photo3.jpg"
+        >
+          <img src="images/thumbs/photo3.jpg" alt="photo3.jpg" />
+        </a>
+
+        <!-- …add one block like this per image in /3dgs/images/ -->
+      </div>
+    </section>
+
+    <!-- Link to 3D Viewer -->
+    <section id="viewer-link">
+      <h2>Interactive 3D Viewer</h2>
+      <p>
+        Click below to open the full-screen Gaussian Splat viewer. Use your mouse or touch
+        to rotate/zoom the model.
+      </p>
+      <a href="viewer.html" class="btn-primary">Launch 3D Viewer</a>
+    </section>
+  </main>
+
+  <!-- GLightbox JS (at end of body) -->
+  <script src="https://cdn.jsdelivr.net/npm/glightbox/dist/js/glightbox.min.js"></script>
+  <script>
+    // Initialize GLightbox (will show the full-res image on click)
+    const lightbox = GLightbox({
+      selector: '.glightbox',
+      touchNavigation: true,
+      loop: true,
+    });
+  </script>
+</body>
+</html>
