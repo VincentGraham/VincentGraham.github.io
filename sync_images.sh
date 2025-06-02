@@ -57,17 +57,23 @@ else
   git push origin "$MAIN_BRANCH"
 fi
 
-# 10. Clean up temp folder
-echo "⏳ Removing temporary folder '$TMP_DIR'..."
-rm -rf "$TMP_DIR"
 
-# 11. Checkout back to source and pop stash
+# 10. Checkout back to source and pop stash
 echo "⏳ Switching back to 'source'..."
 git checkout source
+
+# put the images back in the source branch
+tree "$TMP_DIR"
+cp -r  "$TMP_DIR"/ "images"/
+
 
 if git stash list | grep -q "temp-stash-before-updating-images"; then
   echo "⏳ Restoring any stashed changes on 'source'..."
   git stash pop || true
 fi
+
+# 11. Clean up temp folder
+echo "⏳ Removing temporary folder '$TMP_DIR'..."
+rm -rf "$TMP_DIR"
 
 echo "✅ Images (and thumbnails) synced to '$MAIN_BRANCH' successfully."
