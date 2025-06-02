@@ -28,7 +28,7 @@ __pycache__/
 
 # minify and web optimize the images
 make_thumbnails.sh
-*.sh
+sync_images.sh
 
 
 # Ignore GitHub Pages deployment branch
