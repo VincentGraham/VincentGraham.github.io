@@ -35,6 +35,7 @@ git stash push -m "temp-stash-before-updating-images" || true
 # 6. Checkout main branch
 echo "⏳ Checking out '$MAIN_BRANCH'..."
 git checkout "$MAIN_BRANCH"
+git pull origin "$MAIN_BRANCH" --rebase
 
 # 7. Prepare target folder on main (create if missing)
 echo "⏳ Ensuring '$IMAGES_PATH' exists on '$MAIN_BRANCH'..."
