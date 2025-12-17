@@ -117,6 +117,20 @@ nav h1 {
     margin-top: 2rem;
 }
 
+#camera-rig .demo-media {
+    margin-top: 2rem;
+}
+
+#camera-rig .demo-media img {
+    width: 100%;
+    height: auto;
+    max-height: 70vh;
+    object-fit: cover;
+    display: block;
+    border-radius: 10px;
+    box-shadow: 0 8px 18px rgba(0,0,0,0.15);
+}
+
 .gallery-item {
     background: white;
     border-radius: 8px;
