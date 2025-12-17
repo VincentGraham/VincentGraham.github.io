@@ -28,6 +28,14 @@ jobs:
           git lfs pull --include="images/**" --exclude=""
           git lfs checkout
 
+      - name: Verify LFS images are real files
+        run: |
+          ls -lh images/eeg | head
+          if head -n 1 images/eeg/SDIM7271.JPG | grep -q "version https://git-lfs.github.com/spec"; then
+            echo "ERROR: LFS pointer detected instead of image blob";
+            exit 1;
+          fi
+
       - name: Prepare static site
         run: |
           rm -rf _site
