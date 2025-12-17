@@ -1,2 +1,1 @@
-# VincentGraham.github.io
-a website
+See the website.
