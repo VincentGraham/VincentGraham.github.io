@@ -24,6 +24,14 @@ jobs:
         with:
           lfs: true
 
+      - name: Install Git LFS
+        run: |
+          apt-get update
+          apt-get install -y git-lfs
+
+      - name: Pull LFS files
+        run: git lfs pull
+
       - name: Setup Pages
         uses: actions/configure-pages@v5
 
