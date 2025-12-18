@@ -131,6 +131,50 @@ nav h1 {
     box-shadow: 0 8px 18px rgba(0,0,0,0.15);
 }
 
+.rig-hero {
+    margin-top: 1.5rem;
+}
+
+.rig-hero img {
+    width: 100%;
+    height: auto;
+    border-radius: 10px;
+    box-shadow: 0 8px 18px rgba(0,0,0,0.12);
+    object-fit: cover;
+}
+
+.rig-row {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 1.25rem;
+    margin-top: 1.75rem;
+}
+
+.rig-card {
+    background: white;
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 6px 14px rgba(0,0,0,0.1);
+}
+
+.rig-card img {
+    width: 100%;
+    height: 280px;
+    object-fit: cover;
+    display: block;
+}
+
+.rig-card.rig-tall img {
+    height: 360px;
+}
+
+.rig-caption {
+    padding: 0.75rem 1rem 1rem;
+    color: #444;
+    font-size: 0.98rem;
+    text-align: center;
+}
+
 .gallery-item {
     background: white;
     border-radius: 8px;
@@ -167,6 +211,33 @@ nav h1 {
 .gallery-item p {
     padding: 0 1rem 1rem;
     color: #666;
+}
+
+.eeg-setup {
+    display: flex;
+    gap: 1.5rem;
+    justify-content: center;
+    flex-wrap: wrap;
+    margin-bottom: 2rem;
+}
+
+.eeg-setup-item {
+    max-width: 240px;
+    text-align: center;
+}
+
+.eeg-setup-item img {
+    width: 100%;
+    height: auto;
+    border-radius: 10px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.12);
+    object-fit: cover;
+}
+
+.eeg-setup-item .caption {
+    margin-top: 0.5rem;
+    color: #555;
+    font-size: 0.95rem;
 }
 
 /* Code Projects */
